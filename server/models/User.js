@@ -33,6 +33,13 @@ const userSchema = new mongoose.Schema(
     following: {
       type: [],
     },
+    city: {
+      type: String,
+    },
+    relationship: {
+      type: String,
+      enum: ["Single", "Married"],
+    },
   },
   { timestamps: true }
 );
