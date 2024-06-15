@@ -82,6 +82,9 @@ const getPost = async (req, res) => {
 const getFeed = async (req, res) => {
   try {
     const currUser = await User.findById(req.body.userId);
+    if (!currUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
     const userFollowing = [currUser._id, ...currUser.following];
     const userFeed = await Post.find({ userId: { $in: userFollowing } }).sort({
       updatedAt: -1,
