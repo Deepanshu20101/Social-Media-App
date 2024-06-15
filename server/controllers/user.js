@@ -38,4 +38,49 @@ const getUser = async (req, res) => {
   }
 };
 
-module.exports = { updateUser, deleteUser, getUser };
+const followUser = async (req, res) => {
+  try {
+    if (req.body.userId === req.params.id) {
+      res.status(400).json({ message: "You cannot follow yourself" });
+    } else {
+      const user = await User.findById(req.body.userId);
+      const targetUser = await User.findById(req.params.id);
+      if (!user || !targetUser) {
+        res.status(404).json({ message: "User not found" });
+      }
+      if (user.following.includes(req.params.id)) {
+        res.status(400).json({ message: "You already follow this user" });
+      } else {
+        await user.updateOne({ $push: { following: req.params.id } });
+        await targetUser.updateOne({ $push: { followers: req.body.userId } });
+        res.status(200).json({ message: "User followed succesfully" });
+      }
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json(error);
+  }
+};
+
+const unFollowUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.body.userId);
+    const targetUser = await User.findById(req.params.id);
+    if (!user || !targetUser) {
+      res.status(404).json({ message: "User not found" });
+    } else {
+      if (user.following.includes(req.params.id)) {
+        await user.updateOne({ $pull: { following: req.params.id } });
+        await targetUser.updateOne({ $pull: { followers: req.body.userId } });
+        res.status(200).json({ message: "User unfollowed succesfully" });
+      } else {
+        res.status(400).json({ message: "You do not follow this user" });
+      }
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json(error);
+  }
+};
+
+module.exports = { updateUser, deleteUser, getUser, followUser, unFollowUser };
