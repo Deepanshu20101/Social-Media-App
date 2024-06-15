@@ -1,4 +1,5 @@
 const Post = require("../models/Post");
+const User = require("../models/User");
 
 const createPost = async (req, res) => {
   try {
@@ -66,4 +67,36 @@ const likePost = async (req, res) => {
   }
 };
 
-module.exports = { createPost, updatePost, deletePost, likePost };
+const getPost = async (req, res) => {
+  try {
+    const foundPost = await Post.findById(req.params.id);
+    if (!foundPost) {
+      res.status(404).json({ message: "Post not found" });
+    }
+    res.status(200).json({ post: foundPost });
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};
+
+const getFeed = async (req, res) => {
+  try {
+    const currUser = await User.findById(req.body.userId);
+    const userFollowing = [currUser._id, ...currUser.following];
+    const userFeed = await Post.find({ userId: { $in: userFollowing } }).sort({
+      updatedAt: -1,
+    });
+    res.status(200).json({ userFeed: userFeed });
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};
+
+module.exports = {
+  createPost,
+  updatePost,
+  deletePost,
+  likePost,
+  getPost,
+  getFeed,
+};
