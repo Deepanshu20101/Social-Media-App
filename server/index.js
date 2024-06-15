@@ -6,6 +6,7 @@ const helmet = require("helmet");
 const morgan = require("morgan");
 const userRoute = require("./routes/userRoute");
 const authRoute = require("./routes/authRoute");
+const postRoute = require("./routes/postRoute");
 
 dotenv.config();
 
@@ -18,6 +19,7 @@ const port = 5000;
 
 app.use("/user", userRoute);
 app.use("/auth", authRoute);
+app.use("/post", postRoute);
 
 const startServer = async () => {
   try {
