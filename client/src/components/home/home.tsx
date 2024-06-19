@@ -1,5 +1,14 @@
+import { Box, Toolbar } from "@mui/material";
+
 const HomePage = () => {
-  return <div>home</div>;
+  return (
+    <>
+      <Box sx={{ flexGrow: 1 }}>
+        <Toolbar />
+        home
+      </Box>
+    </>
+  );
 };
 
 export default HomePage;
