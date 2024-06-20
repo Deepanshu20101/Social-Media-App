@@ -1,11 +1,20 @@
 import { Box, Toolbar } from "@mui/material";
+import SharePost from "../sharepost/sharepost";
 
 const HomePage = () => {
   return (
     <>
-      <Box sx={{ flexGrow: 1 }}>
+      <Box
+        sx={{
+          p: 1,
+          display: "flex",
+          flexGrow: 1,
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
         <Toolbar />
-        home
+        <SharePost />
       </Box>
     </>
   );
