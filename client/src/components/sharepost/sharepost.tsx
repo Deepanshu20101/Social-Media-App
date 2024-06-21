@@ -14,11 +14,11 @@ const SharePost = () => {
 
   return (
     <Paper
-      elevation={4}
+      elevation={3}
       sx={{
         cursor: "pointer",
         color: "#989595",
-        borderRadius: 6,
+        borderRadius: 4,
         width: "100%",
         "&:hover": { border: "1px solid #ccc" },
       }}
