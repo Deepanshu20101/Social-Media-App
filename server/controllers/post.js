@@ -81,7 +81,7 @@ const getPost = async (req, res) => {
 
 const getFeed = async (req, res) => {
   try {
-    const currUser = await User.findById(req.body.userId);
+    const currUser = await User.findById(req.params.id);
     if (!currUser) {
       return res.status(404).json({ message: "User not found" });
     }

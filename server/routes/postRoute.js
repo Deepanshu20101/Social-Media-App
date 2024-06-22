@@ -14,6 +14,6 @@ router.put("/:id", updatePost);
 router.delete("/:id", deletePost);
 router.put("/like/:id", likePost);
 router.get("/:id", getPost);
-router.get("/userFeed/all", getFeed);
+router.get("/userFeed/:id", getFeed);
 
 module.exports = router;
