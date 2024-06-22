@@ -4,6 +4,7 @@ import SignUp from "./components/auth/signUp";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import HomePage from "./components/home/home";
 import "./App.css";
+import ProfilePage from "./components/profile/profile";
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(true);
@@ -16,6 +17,12 @@ function App() {
               path="/"
               element={
                 loggedIn ? <HomePage /> : <Navigate replace to="/login" />
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                loggedIn ? <ProfilePage /> : <Navigate replace to="/login" />
               }
             />
             <Route path="/login" element={<LoginPage />} />
