@@ -20,7 +20,7 @@ function App() {
               }
             />
             <Route
-              path="/profile"
+              path="/profile/:uid"
               element={
                 loggedIn ? <ProfilePage /> : <Navigate replace to="/login" />
               }
