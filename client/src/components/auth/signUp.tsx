@@ -2,8 +2,6 @@ import {
   Avatar,
   Box,
   Button,
-  Checkbox,
-  FormControlLabel,
   Grid,
   Link,
   Paper,
@@ -11,8 +9,47 @@ import {
   Typography,
 } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+
+interface FormDataProp {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+}
 
 const SignUp = () => {
+  const [formData, setFormData] = useState<FormDataProp>({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+  });
+
+  const navigate = useNavigate();
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({ ...prevData, [name]: value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try {
+      await axios.post("http://localhost:5000/auth/register", {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        password: formData.password,
+      });
+      navigate("/login");
+    } catch (error) {
+      alert(`${error}`);
+    }
+  };
+
   return (
     <Grid container sx={{ height: "100vh" }}>
       <Grid item lg={7}>
@@ -36,7 +73,7 @@ const SignUp = () => {
             <LockOutlinedIcon />
           </Avatar>
           <Typography variant="h5">Sign Up</Typography>
-          <Box component="form" sx={{ mt: 1 }}>
+          <Box component="form" sx={{ mt: 1 }} onSubmit={handleSubmit}>
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
                 <TextField
@@ -48,6 +85,8 @@ const SignUp = () => {
                   id="firstName"
                   label="First Name"
                   autoFocus
+                  value={formData?.firstName}
+                  onChange={handleChange}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -59,6 +98,8 @@ const SignUp = () => {
                   label="Last Name"
                   name="lastName"
                   autoComplete="lastName"
+                  value={formData?.lastName}
+                  onChange={handleChange}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -70,6 +111,8 @@ const SignUp = () => {
                   name="email"
                   type="email"
                   autoComplete="email"
+                  value={formData?.email}
+                  onChange={handleChange}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -81,6 +124,8 @@ const SignUp = () => {
                   type="password"
                   id="password"
                   autoComplete="current-password"
+                  value={formData?.password}
+                  onChange={handleChange}
                 />
               </Grid>
             </Grid>

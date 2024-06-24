@@ -41,7 +41,7 @@ const Posts = () => {
       }}
     >
       {posts.map((post) => (
-        <Post post={post} />
+        <Post key={post._id} post={post} />
       ))}
     </Box>
   );

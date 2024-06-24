@@ -11,8 +11,41 @@ import {
   Typography,
 } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+
+interface FormDataProp {
+  email: string;
+  password: string;
+}
 
 const LoginPage = () => {
+  const [formData, setFormData] = useState<FormDataProp>({
+    email: "",
+    password: "",
+  });
+
+  const navigate = useNavigate();
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({ ...prevData, [name]: value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try {
+      await axios.post("http://localhost:5000/auth/login", {
+        email: formData.email,
+        password: formData.password,
+      });
+      navigate("/");
+    } catch (error) {
+      alert(`${error}`);
+    }
+  };
+
   return (
     <Grid container sx={{ height: "100vh" }}>
       <Grid item lg={7}>
@@ -36,7 +69,7 @@ const LoginPage = () => {
             <LockOutlinedIcon />
           </Avatar>
           <Typography variant="h5">Sign in</Typography>
-          <Box component="form" sx={{ mt: 1 }}>
+          <Box component="form" sx={{ mt: 1 }} onSubmit={handleSubmit}>
             <TextField
               required
               margin="normal"
@@ -47,6 +80,8 @@ const LoginPage = () => {
               type="email"
               autoComplete="email"
               autoFocus
+              value={formData?.email}
+              onChange={handleChange}
             />
             <TextField
               fullWidth
@@ -57,6 +92,8 @@ const LoginPage = () => {
               type="password"
               id="password"
               autoComplete="current-password"
+              value={formData?.password}
+              onChange={handleChange}
             />
             <FormControlLabel
               control={<Checkbox value="remember" color="primary" />}
