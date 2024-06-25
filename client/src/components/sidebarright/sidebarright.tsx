@@ -16,6 +16,7 @@ import {
 } from "@mui/material";
 import { useContext } from "react";
 import { Context } from "../../context/contextprovider";
+import RightContact from "./rightcontact";
 
 const SideBarRight = () => {
   const { state } = useContext(Context);
@@ -54,17 +55,8 @@ const SideBarRight = () => {
           </IconButton>
         </Box>
         <List>
-          {currentUser.following.map((following: string) => (
-            <ListItem disablePadding>
-              <ListItemButton>
-                <ListItemAvatar>
-                  <Badge badgeInset="14%" color="success">
-                    <Avatar />
-                  </Badge>
-                </ListItemAvatar>
-                <ListItemText primary="Chopper" />
-              </ListItemButton>
-            </ListItem>
+          {currentUser.following.map((userId: string) => (
+            <RightContact userId={userId} />
           ))}
         </List>
       </Box>
