@@ -1,9 +1,10 @@
 import { Favorite, MoreVert, ThumbUp } from "@mui/icons-material";
 import { Avatar, Box, IconButton, Paper, Typography } from "@mui/material";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { format } from "timeago.js";
+import { Context } from "../../context/contextprovider";
 
 interface PostProp {
   _id: string;
@@ -32,6 +33,8 @@ const Post: React.FC<{ post: PostProp }> = ({ post }) => {
   const [user, setUser] = useState<UserProp | null>(null);
   const navigate = useNavigate();
 
+  const { state } = useContext(Context);
+
   useEffect(() => {
     const getUser = async () => {
       try {
@@ -47,7 +50,7 @@ const Post: React.FC<{ post: PostProp }> = ({ post }) => {
   }, [post.userId]);
 
   const handleAvatarRoute = () => {
-    navigate("/profile/:id");
+    navigate(`/profile/${post.userId}`);
   };
 
   return (

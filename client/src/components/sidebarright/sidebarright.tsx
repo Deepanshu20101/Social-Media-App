@@ -14,8 +14,12 @@ import {
   Toolbar,
   Typography,
 } from "@mui/material";
+import { useContext } from "react";
+import { Context } from "../../context/contextprovider";
 
 const SideBarRight = () => {
+  const { state } = useContext(Context);
+  const { currentUser } = state;
   return (
     <Drawer
       variant="permanent"
@@ -50,56 +54,18 @@ const SideBarRight = () => {
           </IconButton>
         </Box>
         <List>
-          <ListItem disablePadding>
-            <ListItemButton>
-              <ListItemAvatar>
-                <Badge badgeInset="14%" color="success">
-                  <Avatar />
-                </Badge>
-              </ListItemAvatar>
-              <ListItemText primary="Chopper" />
-            </ListItemButton>
-          </ListItem>
-          <ListItem disablePadding>
-            <ListItemButton>
-              <ListItemAvatar>
-                <Badge badgeInset="14%" color="success">
-                  <Avatar />
-                </Badge>
-              </ListItemAvatar>
-              <ListItemText primary="Nami" />
-            </ListItemButton>
-          </ListItem>
-          <ListItem disablePadding>
-            <ListItemButton>
-              <ListItemAvatar>
-                <Badge badgeInset="14%" color="success">
-                  <Avatar />
-                </Badge>
-              </ListItemAvatar>
-              <ListItemText primary="Sanji" />
-            </ListItemButton>
-          </ListItem>
-          <ListItem disablePadding>
-            <ListItemButton>
-              <ListItemAvatar>
-                <Badge badgeInset="14%" color="success">
-                  <Avatar />
-                </Badge>
-              </ListItemAvatar>
-              <ListItemText primary="Franky" />
-            </ListItemButton>
-          </ListItem>
-          <ListItem disablePadding>
-            <ListItemButton>
-              <ListItemAvatar>
-                <Badge badgeInset="14%" color="success">
-                  <Avatar />
-                </Badge>
-              </ListItemAvatar>
-              <ListItemText primary="Brook" />
-            </ListItemButton>
-          </ListItem>
+          {currentUser.following.map((following: string) => (
+            <ListItem disablePadding>
+              <ListItemButton>
+                <ListItemAvatar>
+                  <Badge badgeInset="14%" color="success">
+                    <Avatar />
+                  </Badge>
+                </ListItemAvatar>
+                <ListItemText primary="Chopper" />
+              </ListItemButton>
+            </ListItem>
+          ))}
         </List>
       </Box>
     </Drawer>

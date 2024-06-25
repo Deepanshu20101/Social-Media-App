@@ -1,10 +1,14 @@
 import { Label, LocationOn, PermMedia } from "@mui/icons-material";
 import { Avatar, Box, Button, Divider, Paper } from "@mui/material";
-import { useCallback, useState } from "react";
+import { useCallback, useContext, useState } from "react";
 import { useDropzone } from "react-dropzone";
+import { Context } from "../../context/contextprovider";
 
 const SharePost = () => {
   const [files, setFiles] = useState<File[]>([]);
+
+  const { state } = useContext(Context);
+
   const onDrop = useCallback((acceptedFiles: File[]) => {
     setFiles(acceptedFiles);
   }, []);
@@ -24,7 +28,7 @@ const SharePost = () => {
       }}
     >
       <Box sx={{ display: "flex", alignItems: "center", p: 2 }}>
-        <Avatar />
+        <Avatar src={state.currentUser.profilePic} />
         <Box component="div" {...getRootProps()} sx={{ flexGrow: 1, ml: 2 }}>
           <input {...getInputProps()} />
           {isDragActive ? (

@@ -1,36 +1,43 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import LoginPage from "./components/auth/login";
 import SignUp from "./components/auth/signUp";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import HomePage from "./components/home/home";
 import "./App.css";
 import ProfilePage from "./components/profile/profile";
+import { Context } from "./context/contextprovider";
 
 function App() {
-  const [loggedIn, setLoggedIn] = useState(true);
+  const { state } = useContext(Context);
   return (
-    <>
-      <BrowserRouter>
-        <div className="app">
-          <Routes>
-            <Route
-              path="/"
-              element={
-                loggedIn ? <HomePage /> : <Navigate replace to="/login" />
-              }
-            />
-            <Route
-              path="/profile/:uid"
-              element={
-                loggedIn ? <ProfilePage /> : <Navigate replace to="/login" />
-              }
-            />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<SignUp />} />
-          </Routes>
-        </div>
-      </BrowserRouter>
-    </>
+    <BrowserRouter>
+      <div className="app">
+        <Routes>
+          <Route
+            path="/"
+            element={
+              state.currentUser ? (
+                <HomePage />
+              ) : (
+                <Navigate replace to="/login" />
+              )
+            }
+          />
+          <Route
+            path="/profile/:userId"
+            element={
+              state.currentUser ? (
+                <ProfilePage />
+              ) : (
+                <Navigate replace to="/login" />
+              )
+            }
+          />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<SignUp />} />
+        </Routes>
+      </div>
+    </BrowserRouter>
   );
 }
 

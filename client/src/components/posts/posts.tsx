@@ -1,7 +1,8 @@
 import { Box } from "@mui/material";
 import Post from "../post/post";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import axios from "axios";
+import { Context } from "../../context/contextprovider";
 
 interface Post {
   _id: string;
@@ -16,11 +17,12 @@ interface Post {
 const Posts = () => {
   const [posts, setPosts] = useState<Post[]>([]);
 
+  const { state } = useContext(Context);
   useEffect(() => {
     const getPosts = async () => {
       try {
         const posts = await axios.get(
-          "http://localhost:5000/post/userFeed/666c1542c3faedd671afffbe"
+          `http://localhost:5000/post/userFeed/${state.currentUser._id}`
         );
         setPosts(posts.data.userFeed);
       } catch (error) {
