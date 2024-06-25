@@ -9,40 +9,26 @@ import {
   Typography,
 } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import { useState } from "react";
+import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-interface FormDataProp {
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-}
-
 const SignUp = () => {
-  const [formData, setFormData] = useState<FormDataProp>({
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
-  });
+  const email = useRef<HTMLInputElement>();
+  const password = useRef<HTMLInputElement>();
+  const firstName = useRef<HTMLInputElement>();
+  const lastName = useRef<HTMLInputElement>();
 
   const navigate = useNavigate();
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({ ...prevData, [name]: value }));
-  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       await axios.post("http://localhost:5000/auth/register", {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        email: formData.email,
-        password: formData.password,
+        firstName: firstName.current?.value,
+        lastName: lastName.current?.value,
+        email: email.current?.value,
+        password: password.current?.value,
       });
       navigate("/login");
     } catch (error) {
@@ -85,8 +71,7 @@ const SignUp = () => {
                   id="firstName"
                   label="First Name"
                   autoFocus
-                  value={formData?.firstName}
-                  onChange={handleChange}
+                  inputRef={firstName}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -98,8 +83,7 @@ const SignUp = () => {
                   label="Last Name"
                   name="lastName"
                   autoComplete="lastName"
-                  value={formData?.lastName}
-                  onChange={handleChange}
+                  inputRef={lastName}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -111,8 +95,7 @@ const SignUp = () => {
                   name="email"
                   type="email"
                   autoComplete="email"
-                  value={formData?.email}
-                  onChange={handleChange}
+                  inputRef={email}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -124,8 +107,7 @@ const SignUp = () => {
                   type="password"
                   id="password"
                   autoComplete="current-password"
-                  value={formData?.password}
-                  onChange={handleChange}
+                  inputRef={password}
                 />
               </Grid>
             </Grid>

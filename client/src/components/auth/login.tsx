@@ -11,34 +11,22 @@ import {
   Typography,
 } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import { useState } from "react";
+import { useRef } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-interface FormDataProp {
-  email: string;
-  password: string;
-}
-
 const LoginPage = () => {
-  const [formData, setFormData] = useState<FormDataProp>({
-    email: "",
-    password: "",
-  });
+  const email = useRef<HTMLInputElement>();
+  const password = useRef<HTMLInputElement>();
 
   const navigate = useNavigate();
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({ ...prevData, [name]: value }));
-  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       await axios.post("http://localhost:5000/auth/login", {
-        email: formData.email,
-        password: formData.password,
+        email: email.current?.value,
+        password: password.current?.value,
       });
       navigate("/");
     } catch (error) {
@@ -80,8 +68,7 @@ const LoginPage = () => {
               type="email"
               autoComplete="email"
               autoFocus
-              value={formData?.email}
-              onChange={handleChange}
+              inputRef={email}
             />
             <TextField
               fullWidth
@@ -92,8 +79,7 @@ const LoginPage = () => {
               type="password"
               id="password"
               autoComplete="current-password"
-              value={formData?.password}
-              onChange={handleChange}
+              inputRef={password}
             />
             <FormControlLabel
               control={<Checkbox value="remember" color="primary" />}
