@@ -11,23 +11,28 @@ import {
   Typography,
 } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import { useRef } from "react";
+import { useContext, useRef } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { Context } from "../../context/contextprovider";
 
 const LoginPage = () => {
   const email = useRef<HTMLInputElement>();
   const password = useRef<HTMLInputElement>();
 
+  const { dispatch } = useContext(Context);
+
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    dispatch({ type: "LOGIN_START" });
     try {
-      await axios.post("http://localhost:5000/auth/login", {
+      const user = await axios.post("http://localhost:5000/auth/login", {
         email: email.current?.value,
         password: password.current?.value,
       });
+      dispatch({ type: "LOGIN_SUCCESS", payload: user.data.user });
       navigate("/");
     } catch (error) {
       alert(`${error}`);

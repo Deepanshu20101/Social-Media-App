@@ -1,4 +1,4 @@
-import { ReactNode, createContext, useReducer } from "react";
+import { ReactNode, createContext, useEffect, useReducer } from "react";
 import reducer from "./reducer";
 
 interface Action {
@@ -15,8 +15,10 @@ interface StateProp {
   loading: boolean;
 }
 
+const currentUserStorage = localStorage.getItem("currentUser");
+
 const initialState: StateProp = {
-  currentUser: null,
+  currentUser: currentUserStorage ? JSON.parse(currentUserStorage) : null,
   loading: false,
 };
 
@@ -29,6 +31,14 @@ export const ContextProvider: React.FC<contextProviderProps> = ({
   children,
 }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
+
+  useEffect(() => {
+    if (state.currentUser) {
+      localStorage.setItem("currentUser", JSON.stringify(state.currentUser));
+    } else {
+      localStorage.removeItem("currentUser");
+    }
+  }, [state.currentUser]);
 
   return (
     <Context.Provider
