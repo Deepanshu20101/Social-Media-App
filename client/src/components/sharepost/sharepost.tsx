@@ -25,6 +25,7 @@ const SharePost = () => {
         borderRadius: 4,
         width: "100%",
         "&:hover": { border: "1px solid #ccc" },
+        mt: 2,
       }}
     >
       <Box sx={{ display: "flex", alignItems: "center", p: 2 }}>
