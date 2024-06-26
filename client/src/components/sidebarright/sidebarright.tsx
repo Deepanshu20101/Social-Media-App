@@ -14,7 +14,7 @@ import {
   Toolbar,
   Typography,
 } from "@mui/material";
-import { useContext } from "react";
+import { Key, useContext } from "react";
 import { Context } from "../../context/contextprovider";
 import RightContact from "./rightcontact";
 
@@ -55,8 +55,8 @@ const SideBarRight = () => {
           </IconButton>
         </Box>
         <List>
-          {currentUser.following.map((userId: string) => (
-            <RightContact userId={userId} />
+          {currentUser.following.map((userId: string, idx: Key) => (
+            <RightContact userId={userId} key={idx} />
           ))}
         </List>
       </Box>

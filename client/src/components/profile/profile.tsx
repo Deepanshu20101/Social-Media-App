@@ -3,8 +3,15 @@ import TopBar from "../topbar/topbar";
 import SideBarLeft from "../sidebarleft/sidebarleft";
 import SharePost from "../sharepost/sharepost";
 import Posts from "../posts/posts";
+import { Key, useContext } from "react";
+import { Context } from "../../context/contextprovider";
+import ProfileContact from "./profilecontacts";
 
 const ProfilePage = () => {
+  const { state } = useContext(Context);
+  const { currentUser } = state;
+  console.log(currentUser);
+
   return (
     <>
       <TopBar />
@@ -22,12 +29,12 @@ const ProfilePage = () => {
         <Box sx={{ width: "100%", position: "relative", mb: 2 }}>
           <Box sx={{ height: "320px" }}>
             <img
-              src="/assets/1.png"
+              src={currentUser.coverPic}
               alt="coverImg"
               style={{ width: "100%", height: "260px", objectFit: "cover" }}
             />
             <Avatar
-              src="/assets/2.png"
+              src={currentUser.profilePic}
               sx={{
                 height: 160,
                 width: 160,
@@ -48,7 +55,7 @@ const ProfilePage = () => {
             }}
           >
             <Typography variant="h5" sx={{ fontWeight: 700 }}>
-              User name
+              {currentUser.firstName} {currentUser.lastName}
             </Typography>
             <Typography variant="body1">User biography</Typography>
           </Box>
@@ -63,7 +70,7 @@ const ProfilePage = () => {
               }}
             >
               <SharePost />
-              <Posts />
+              <Posts profile={true} />
             </Box>
           </Grid>
           <Grid item lg={5}>
@@ -71,9 +78,11 @@ const ProfilePage = () => {
               <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
                 User Information
               </Typography>
-              <Typography variant="subtitle2">{<b>City: </b>}</Typography>
               <Typography variant="subtitle2">
-                {<b>Relationship: </b>}
+                {<b>City: </b>} {currentUser.city}
+              </Typography>
+              <Typography variant="subtitle2">
+                {<b>Relationship: </b>} {currentUser.relationship}
               </Typography>
             </Box>
             <Box>
@@ -81,78 +90,9 @@ const ProfilePage = () => {
                 User friends
               </Typography>
               <Grid container spacing={2}>
-                <Grid item lg={4}>
-                  <img
-                    src="/assets/2.png"
-                    style={{
-                      width: "100%",
-                      height: "100px",
-                      objectFit: "cover",
-                      borderRadius: "15px",
-                    }}
-                  />
-                  <Typography variant="body1">Friend 1</Typography>
-                </Grid>
-                <Grid item lg={4}>
-                  <img
-                    src="/assets/2.png"
-                    style={{
-                      width: "100%",
-                      height: "100px",
-                      objectFit: "cover",
-                      borderRadius: "15px",
-                    }}
-                  />
-                  <Typography variant="body1">Friend 1</Typography>
-                </Grid>
-                <Grid item lg={4}>
-                  <img
-                    src="/assets/2.png"
-                    style={{
-                      width: "100%",
-                      height: "100px",
-                      objectFit: "cover",
-                      borderRadius: "15px",
-                    }}
-                  />
-                  <Typography variant="body1">Friend 1</Typography>
-                </Grid>
-                <Grid item lg={4}>
-                  <img
-                    src="/assets/2.png"
-                    style={{
-                      width: "100%",
-                      height: "100px",
-                      objectFit: "cover",
-                      borderRadius: "15px",
-                    }}
-                  />
-                  <Typography variant="body1">Friend 1</Typography>
-                </Grid>
-                <Grid item lg={4}>
-                  <img
-                    src="/assets/2.png"
-                    style={{
-                      width: "100%",
-                      height: "100px",
-                      objectFit: "cover",
-                      borderRadius: "15px",
-                    }}
-                  />
-                  <Typography variant="body1">Friend 1</Typography>
-                </Grid>
-                <Grid item lg={4}>
-                  <img
-                    src="/assets/2.png"
-                    style={{
-                      width: "100%",
-                      height: "100px",
-                      objectFit: "cover",
-                      borderRadius: "15px",
-                    }}
-                  />
-                  <Typography variant="body1">Friend 1</Typography>
-                </Grid>
+                {currentUser.following.map((userId: string, idx: Key) => (
+                  <ProfileContact userId={userId} key={idx} />
+                ))}
               </Grid>
             </Box>
           </Grid>

@@ -6,6 +6,7 @@ const {
   likePost,
   getPost,
   getFeed,
+  getProfileFeed,
 } = require("../controllers/post");
 const router = express.Router();
 
@@ -15,5 +16,6 @@ router.delete("/:id", deletePost);
 router.put("/like/:id", likePost);
 router.get("/:id", getPost);
 router.get("/userFeed/:id", getFeed);
+router.get("/profileFeed/:id", getProfileFeed);
 
 module.exports = router;

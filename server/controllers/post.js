@@ -87,9 +87,22 @@ const getFeed = async (req, res) => {
     }
     const userFollowing = [currUser._id, ...currUser.following];
     const userFeed = await Post.find({ userId: { $in: userFollowing } }).sort({
-      updatedAt: -1,
+      createdAt: -1,
     });
-    res.status(200).json({ userFeed: userFeed });
+    res.status(200).json({ result: userFeed });
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};
+
+const getProfileFeed = async (req, res) => {
+  try {
+    const currUser = await User.findById(req.params.id);
+    if (!currUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const profileFeed = await Post.find({ userId: req.params.id });
+    res.status(200).json({ result: profileFeed });
   } catch (error) {
     res.status(500).json(error);
   }
@@ -102,4 +115,5 @@ module.exports = {
   likePost,
   getPost,
   getFeed,
+  getProfileFeed,
 };
