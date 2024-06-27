@@ -14,16 +14,16 @@ interface Post {
   createdAt: Date;
 }
 
-const Posts: React.FC<{ profile: boolean }> = ({ profile }) => {
+const Posts: React.FC<{ profileUserId?: string }> = ({ profileUserId }) => {
   const [posts, setPosts] = useState<Post[]>([]);
 
   const { state } = useContext(Context);
   useEffect(() => {
     const getPosts = async () => {
       try {
-        const posts = profile
+        const posts = profileUserId
           ? await axios.get(
-              `http://localhost:5000/post/profileFeed/${state.currentUser._id}`
+              `http://localhost:5000/post/profileFeed/${profileUserId}`
             )
           : await axios.get(
               `http://localhost:5000/post/userFeed/${state.currentUser._id}`
@@ -34,7 +34,7 @@ const Posts: React.FC<{ profile: boolean }> = ({ profile }) => {
       }
     };
     getPosts();
-  }, []);
+  }, [profileUserId, state.currentUser._id]);
 
   return (
     <Box

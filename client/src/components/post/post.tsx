@@ -50,7 +50,7 @@ const Post: React.FC<{ post: PostProp }> = ({ post }) => {
   }, [post.userId]);
 
   const handleAvatarRoute = () => {
-    navigate(`/profile/${post.userId}`);
+    navigate(`/profile/${user?._id}`);
   };
 
   return (

@@ -21,7 +21,7 @@ const HomePage = () => {
       >
         <Toolbar />
         <SharePost />
-        <Posts profile={false} />
+        <Posts />
       </Box>
       <SideBarRight />
     </>

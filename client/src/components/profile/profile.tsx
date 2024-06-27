@@ -3,14 +3,40 @@ import TopBar from "../topbar/topbar";
 import SideBarLeft from "../sidebarleft/sidebarleft";
 import SharePost from "../sharepost/sharepost";
 import Posts from "../posts/posts";
-import { Key, useContext } from "react";
-import { Context } from "../../context/contextprovider";
+import { Key, useEffect, useState } from "react";
 import ProfileContact from "./profilecontacts";
+import { useParams } from "react-router-dom";
+import axios from "axios";
+
+interface UserProp {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  profilePic: string;
+  coverPic: string;
+  followers: string[];
+  following: string[];
+  city: string;
+  relationship: "Single" | "Married";
+}
 
 const ProfilePage = () => {
-  const { state } = useContext(Context);
-  const { currentUser } = state;
-  console.log(currentUser);
+  const [user, setUser] = useState<UserProp | null>(null);
+
+  const { userId } = useParams();
+
+  useEffect(() => {
+    const getUser = async () => {
+      try {
+        const user = await axios.get(`http://localhost:5000/user/${userId}`);
+        setUser(user.data.user);
+      } catch (error) {
+        alert(`${error}`);
+      }
+    };
+    getUser();
+  }, [userId]);
 
   return (
     <>
@@ -29,12 +55,12 @@ const ProfilePage = () => {
         <Box sx={{ width: "100%", position: "relative", mb: 2 }}>
           <Box sx={{ height: "320px" }}>
             <img
-              src={currentUser.coverPic}
+              src={user?.coverPic}
               alt="coverImg"
               style={{ width: "100%", height: "260px", objectFit: "cover" }}
             />
             <Avatar
-              src={currentUser.profilePic}
+              src={user?.profilePic}
               sx={{
                 height: 160,
                 width: 160,
@@ -55,7 +81,7 @@ const ProfilePage = () => {
             }}
           >
             <Typography variant="h5" sx={{ fontWeight: 700 }}>
-              {currentUser.firstName} {currentUser.lastName}
+              {user?.firstName} {user?.lastName}
             </Typography>
             <Typography variant="body1">User biography</Typography>
           </Box>
@@ -70,7 +96,7 @@ const ProfilePage = () => {
               }}
             >
               <SharePost />
-              <Posts profile={true} />
+              <Posts profileUserId={userId!} />
             </Box>
           </Grid>
           <Grid item lg={5}>
@@ -79,10 +105,10 @@ const ProfilePage = () => {
                 User Information
               </Typography>
               <Typography variant="subtitle2">
-                {<b>City: </b>} {currentUser.city}
+                {<b>City: </b>} {user?.city}
               </Typography>
               <Typography variant="subtitle2">
-                {<b>Relationship: </b>} {currentUser.relationship}
+                {<b>Relationship: </b>} {user?.relationship}
               </Typography>
             </Box>
             <Box>
@@ -90,7 +116,7 @@ const ProfilePage = () => {
                 User friends
               </Typography>
               <Grid container spacing={2}>
-                {currentUser.following.map((userId: string, idx: Key) => (
+                {user?.following.map((userId: string, idx: Key) => (
                   <ProfileContact userId={userId} key={idx} />
                 ))}
               </Grid>
