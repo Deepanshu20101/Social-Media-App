@@ -30,10 +30,15 @@ interface UserProp {
 }
 
 const Post: React.FC<{ post: PostProp }> = ({ post }) => {
-  const [user, setUser] = useState<UserProp | null>(null);
-  const navigate = useNavigate();
-
   const { state } = useContext(Context);
+
+  const [user, setUser] = useState<UserProp | null>(null);
+  const [likes, setLikes] = useState(post.likes.length);
+  const [isLiked, setIsLiked] = useState(
+    post.likes.includes(state.currentUser._id)
+  );
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const getUser = async () => {
@@ -51,6 +56,20 @@ const Post: React.FC<{ post: PostProp }> = ({ post }) => {
 
   const handleAvatarRoute = () => {
     navigate(`/profile/${user?._id}`);
+  };
+
+  const handleLike = async () => {
+    try {
+      await axios.put(`http://localhost:5000/post/like/${post._id}`, {
+        userId: state.currentUser._id,
+      });
+      setLikes(isLiked ? likes - 1 : likes + 1);
+      setIsLiked(!isLiked);
+    } catch (error) {
+      alert(`${error}`);
+      setLikes(isLiked ? likes + 1 : likes - 1);
+      setIsLiked(!isLiked);
+    }
   };
 
   return (
@@ -80,17 +99,33 @@ const Post: React.FC<{ post: PostProp }> = ({ post }) => {
       <Box sx={{ display: "flex", alignItems: "center", py: 1, px: 2 }}>
         <IconButton
           size="small"
-          sx={{ bgcolor: "#1273eb", color: "white", mr: 0.5 }}
+          sx={{
+            bgcolor: "#1273eb",
+            color: "white",
+            mr: 0.5,
+            "&:hover": {
+              bgcolor: "#1273eb",
+            },
+          }}
+          onClick={handleLike}
         >
           <ThumbUp fontSize="small" />
         </IconButton>
         <IconButton
           size="small"
-          sx={{ bgcolor: "#fb5252", color: "white", mr: 1 }}
+          sx={{
+            bgcolor: "#fb5252",
+            color: "white",
+            mr: 1,
+            "&:hover": {
+              bgcolor: "#fb5252",
+            },
+          }}
+          onClick={handleLike}
         >
           <Favorite fontSize="small" />
         </IconButton>
-        <Typography variant="body2">{post.likes.length} likes</Typography>
+        <Typography variant="body2">{likes} likes</Typography>
         <Typography
           variant="body2"
           sx={{ ml: "auto", textDecoration: "underline dotted" }}
