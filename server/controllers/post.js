@@ -101,7 +101,9 @@ const getProfileFeed = async (req, res) => {
     if (!currUser) {
       return res.status(404).json({ message: "User not found" });
     }
-    const profileFeed = await Post.find({ userId: req.params.id });
+    const profileFeed = await Post.find({ userId: req.params.id }).sort({
+      createdAt: -1,
+    });
     res.status(200).json({ result: profileFeed });
   } catch (error) {
     res.status(500).json(error);

@@ -1,42 +1,66 @@
 import { Label, LocationOn, PermMedia } from "@mui/icons-material";
-import { Avatar, Box, Button, Divider, Paper } from "@mui/material";
-import { useCallback, useContext, useState } from "react";
-import { useDropzone } from "react-dropzone";
+import { Avatar, Box, Button, Divider, Paper, TextField } from "@mui/material";
+import { useContext, useRef, useState } from "react";
 import { Context } from "../../context/contextprovider";
+import { v4 as uuidv4 } from "uuid";
+import UploadFile from "../../firebase/uploadfile";
+import axios from "axios";
 
 const SharePost = () => {
-  const [files, setFiles] = useState<File[]>([]);
+  const captionRef = useRef<HTMLInputElement>();
+  const inputFileRef = useRef<HTMLInputElement>();
 
   const { state } = useContext(Context);
+  const { currentUser } = state;
 
-  const onDrop = useCallback((acceptedFiles: File[]) => {
-    setFiles(acceptedFiles);
-  }, []);
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    onDrop,
-  });
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try {
+      const imgName =
+        uuidv4() +
+          "." +
+          inputFileRef.current?.files?.[0].name.split(".").pop() || "jpg";
+      const url = await UploadFile(
+        inputFileRef.current!.files![0],
+        `posts/${currentUser._id}`,
+        imgName
+      );
+      await axios.post("http://localhost:5000/post/", {
+        userId: currentUser._id,
+        caption: captionRef.current?.value,
+        img: url,
+      });
+    } catch (error) {
+      alert(`${error}`);
+    }
+  };
 
   return (
     <Paper
       elevation={3}
+      component="form"
       sx={{
-        cursor: "pointer",
         color: "#989595",
         borderRadius: 4,
         width: "100%",
         "&:hover": { border: "1px solid #ccc" },
         mt: 2,
       }}
+      onSubmit={handleSubmit}
     >
       <Box sx={{ display: "flex", alignItems: "center", p: 2 }}>
-        <Avatar src={state.currentUser.profilePic} />
-        <Box component="div" {...getRootProps()} sx={{ flexGrow: 1, ml: 2 }}>
-          <input {...getInputProps()} />
-          {isDragActive ? (
-            <p style={{ color: "green" }}>Drop the files here...</p>
-          ) : (
-            <p>What's in your mind...?</p>
-          )}
+        <Avatar
+          src={state.currentUser.profilePic}
+          sx={{ width: 50, height: 50 }}
+        />
+        <Box sx={{ flexGrow: 1, ml: 2 }}>
+          <TextField
+            label="What's in your mind...?"
+            name="caption"
+            id="caption"
+            inputRef={captionRef}
+            sx={{ "& fieldset": { border: "none" }, width: 350 }}
+          />
         </Box>
       </Box>
       <Divider variant="middle" sx={{ borderBottomWidth: "2px" }} />
@@ -47,8 +71,17 @@ const SharePost = () => {
           flexDirection: "row",
         }}
       >
-        <Button startIcon={<PermMedia />} sx={{ textTransform: "capitalize" }}>
+        <Button
+          component="label"
+          startIcon={<PermMedia />}
+          sx={{ textTransform: "capitalize" }}
+        >
           Photo/Video
+          <TextField
+            type="file"
+            sx={{ display: "none" }}
+            inputRef={inputFileRef}
+          />
         </Button>
         <Button startIcon={<Label />} sx={{ textTransform: "capitalize" }}>
           Tag
@@ -58,6 +91,7 @@ const SharePost = () => {
         </Button>
         <Button
           variant="contained"
+          type="submit"
           sx={{ ml: "auto", textTransform: "capitalize" }}
         >
           Share
