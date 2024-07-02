@@ -1,6 +1,14 @@
-import { Label, LocationOn, PermMedia } from "@mui/icons-material";
-import { Avatar, Box, Button, Divider, Paper, TextField } from "@mui/material";
-import { useContext, useRef, useState } from "react";
+import { Cancel, Label, LocationOn, PermMedia } from "@mui/icons-material";
+import {
+  Avatar,
+  Box,
+  Button,
+  Divider,
+  IconButton,
+  Paper,
+  TextField,
+} from "@mui/material";
+import React, { useContext, useRef, useState } from "react";
 import { Context } from "../../context/contextprovider";
 import { v4 as uuidv4 } from "uuid";
 import UploadFile from "../../firebase/uploadfile";
@@ -9,9 +17,13 @@ import axios from "axios";
 const SharePost = () => {
   const captionRef = useRef<HTMLInputElement>();
   const inputFileRef = useRef<HTMLInputElement>();
-
+  const [imgFile, setImgFile] = useState<File | null>();
   const { state, dispatch } = useContext(Context);
   const { currentUser } = state;
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setImgFile(e.target?.files?.[0]);
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -66,6 +78,28 @@ const SharePost = () => {
         </Box>
       </Box>
       <Divider variant="middle" sx={{ borderBottomWidth: "2px" }} />
+      {imgFile && (
+        <Box sx={{ position: "relative", mt: 1, px: 2 }}>
+          <img
+            src={URL.createObjectURL(imgFile)}
+            alt="img"
+            style={{ width: "200px", maxHeight: "200px", display: "contain" }}
+          />
+          <IconButton
+            sx={{
+              p: 0,
+              position: "absolute",
+              left: 190,
+              color: "inherit",
+            }}
+            onClick={() => {
+              setImgFile(null);
+            }}
+          >
+            <Cancel />
+          </IconButton>
+        </Box>
+      )}
       <Box
         sx={{
           p: 2,
@@ -83,6 +117,7 @@ const SharePost = () => {
             type="file"
             sx={{ display: "none" }}
             inputRef={inputFileRef}
+            onChange={handleFileChange}
           />
         </Button>
         <Button startIcon={<Label />} sx={{ textTransform: "capitalize" }}>
