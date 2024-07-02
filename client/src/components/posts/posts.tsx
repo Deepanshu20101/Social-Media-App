@@ -15,9 +15,10 @@ interface Post {
 }
 
 const Posts: React.FC<{ profileUserId?: string }> = ({ profileUserId }) => {
-  const [posts, setPosts] = useState<Post[]>([]);
+  const { state, dispatch } = useContext(Context);
 
-  const { state } = useContext(Context);
+  const [posts, setPosts] = useState<Post[]>(state.timelinePost);
+
   useEffect(() => {
     const getPosts = async () => {
       try {
@@ -29,6 +30,7 @@ const Posts: React.FC<{ profileUserId?: string }> = ({ profileUserId }) => {
               `http://localhost:5000/post/userFeed/${state.currentUser._id}`
             );
         setPosts(posts.data.result);
+        dispatch({ type: "GET_POST", payload: posts.data.result });
       } catch (error) {
         alert(`Error ${error}`);
       }

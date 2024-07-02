@@ -10,7 +10,7 @@ const SharePost = () => {
   const captionRef = useRef<HTMLInputElement>();
   const inputFileRef = useRef<HTMLInputElement>();
 
-  const { state } = useContext(Context);
+  const { state, dispatch } = useContext(Context);
   const { currentUser } = state;
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -25,11 +25,12 @@ const SharePost = () => {
         `posts/${currentUser._id}`,
         imgName
       );
-      await axios.post("http://localhost:5000/post/", {
+      const newPost = await axios.post("http://localhost:5000/post/", {
         userId: currentUser._id,
         caption: captionRef.current?.value,
         img: url,
       });
+      dispatch({ type: "UPDATE_POST", payload: newPost.data.post });
     } catch (error) {
       alert(`${error}`);
     }

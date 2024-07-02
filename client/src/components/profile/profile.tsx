@@ -3,10 +3,11 @@ import TopBar from "../topbar/topbar";
 import SideBarLeft from "../sidebarleft/sidebarleft";
 import SharePost from "../sharepost/sharepost";
 import Posts from "../posts/posts";
-import { Key, useEffect, useState } from "react";
+import { Key, useContext, useEffect, useState } from "react";
 import ProfileContact from "./profilecontacts";
 import { useParams } from "react-router-dom";
 import axios from "axios";
+import { Context } from "../../context/contextprovider";
 
 interface UserProp {
   _id: string;
@@ -23,6 +24,8 @@ interface UserProp {
 
 const ProfilePage = () => {
   const [user, setUser] = useState<UserProp | null>(null);
+  const { state } = useContext(Context);
+  const { currentUser } = state;
 
   const { userId } = useParams();
 
@@ -95,7 +98,7 @@ const ProfilePage = () => {
                 alignItems: "center",
               }}
             >
-              <SharePost />
+              {userId === currentUser._id && <SharePost />}
               <Posts profileUserId={userId!} />
             </Box>
           </Grid>

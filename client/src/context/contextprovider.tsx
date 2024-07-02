@@ -10,9 +10,20 @@ interface contextProviderProps {
   children: ReactNode;
 }
 
+interface PostProp {
+  _id: string;
+  userId: string;
+  caption: string;
+  img: string;
+  likes: string[];
+  comments: string[];
+  createdAt: Date;
+}
+
 interface StateProp {
   currentUser: any;
   loading: boolean;
+  timelinePost: PostProp[];
 }
 
 const currentUserStorage = localStorage.getItem("currentUser");
@@ -20,6 +31,7 @@ const currentUserStorage = localStorage.getItem("currentUser");
 const initialState: StateProp = {
   currentUser: currentUserStorage ? JSON.parse(currentUserStorage) : null,
   loading: false,
+  timelinePost: [],
 };
 
 export const Context = createContext<{
