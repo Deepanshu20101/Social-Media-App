@@ -46,6 +46,7 @@ const SharePost = () => {
         width: "100%",
         "&:hover": { border: "1px solid #ccc" },
         mt: 2,
+        mb: 2,
       }}
       onSubmit={handleSubmit}
     >

@@ -1,4 +1,4 @@
-import { Avatar, Box, Grid, Paper, Toolbar, Typography } from "@mui/material";
+import { Avatar, Box, Button, Grid, Toolbar, Typography } from "@mui/material";
 import TopBar from "../topbar/topbar";
 import SideBarLeft from "../sidebarleft/sidebarleft";
 import SharePost from "../sharepost/sharepost";
@@ -8,6 +8,7 @@ import ProfileContact from "./profilecontacts";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { Context } from "../../context/contextprovider";
+import { PersonAdd, PersonRemove } from "@mui/icons-material";
 
 interface UserProp {
   _id: string;
@@ -23,11 +24,14 @@ interface UserProp {
 }
 
 const ProfilePage = () => {
-  const [user, setUser] = useState<UserProp | null>(null);
-  const { state } = useContext(Context);
+  const { userId } = useParams();
+  const { state, dispatch } = useContext(Context);
   const { currentUser } = state;
 
-  const { userId } = useParams();
+  const [user, setUser] = useState<UserProp | null>(null);
+  const [followed, setFollowed] = useState(
+    currentUser.following.includes(userId)
+  );
 
   useEffect(() => {
     const getUser = async () => {
@@ -40,6 +44,25 @@ const ProfilePage = () => {
     };
     getUser();
   }, [userId]);
+
+  const handleFollow = async () => {
+    try {
+      if (!followed) {
+        await axios.put(`http://localhost:5000/user/follow/${userId}`, {
+          userId: currentUser._id,
+        });
+        dispatch({ type: "FOLLOW_USER", payload: userId });
+      } else {
+        await axios.put(`http://localhost:5000/user/unfollow/${userId}`, {
+          userId: currentUser._id,
+        });
+        dispatch({ type: "UNFOLLOW_USER", payload: userId });
+      }
+      setFollowed(!followed);
+    } catch (error) {
+      alert(`${error}`);
+    }
+  };
 
   return (
     <>
@@ -103,7 +126,24 @@ const ProfilePage = () => {
             </Box>
           </Grid>
           <Grid item lg={5}>
-            <Box sx={{ mb: 2 }}>
+            {currentUser._id !== userId && (
+              <Button
+                variant="contained"
+                endIcon={followed ? <PersonRemove /> : <PersonAdd />}
+                sx={{ mb: 2, mt: 1, textTransform: "capitalize" }}
+                onClick={handleFollow}
+              >
+                {followed ? "Unfollow" : "Follow"}
+              </Button>
+            )}
+
+            <Box
+              sx={{
+                mb: 2,
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
               <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
                 User Information
               </Typography>
@@ -114,7 +154,13 @@ const ProfilePage = () => {
                 {<b>Relationship: </b>} {user?.relationship}
               </Typography>
             </Box>
-            <Box>
+            <Box
+              sx={{
+                mb: 2,
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
               <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
                 User friends
               </Typography>

@@ -32,6 +32,24 @@ const reducer = (state: StateProp, action: Action) => {
         ...state,
         timelinePost: [...state.timelinePost, action.payload],
       };
+    case "FOLLOW_USER":
+      return {
+        ...state,
+        currentUser: {
+          ...state.currentUser,
+          following: [...state.currentUser.following, action.payload],
+        },
+      };
+    case "UNFOLLOW_USER":
+      return {
+        ...state,
+        currentUser: {
+          ...state.currentUser,
+          following: state.currentUser.following.filter(
+            (following: string) => following !== action.payload
+          ),
+        },
+      };
     default:
       throw new Error(`Unhandled action type: ${action.type}`);
   }

@@ -44,7 +44,6 @@ const Posts: React.FC<{ profileUserId?: string }> = ({ profileUserId }) => {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        my: 2,
         width: "100%",
       }}
     >
