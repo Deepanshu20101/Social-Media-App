@@ -3,6 +3,7 @@ import {
   Avatar,
   Box,
   Button,
+  CircularProgress,
   Divider,
   IconButton,
   Paper,
@@ -18,8 +19,9 @@ const SharePost = () => {
   const captionRef = useRef<HTMLInputElement>();
   const inputFileRef = useRef<HTMLInputElement>();
   const [imgFile, setImgFile] = useState<File | null>();
+  const [progress, setProgress] = useState<number>(0);
   const { state, dispatch } = useContext(Context);
-  const { currentUser } = state;
+  const { currentUser, loading } = state;
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setImgFile(e.target?.files?.[0]);
@@ -28,6 +30,7 @@ const SharePost = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
+      dispatch({ type: "LOADING_START" });
       const imgName =
         uuidv4() +
           "." +
@@ -35,7 +38,8 @@ const SharePost = () => {
       const url = await UploadFile(
         inputFileRef.current!.files![0],
         `posts/${currentUser._id}`,
-        imgName
+        imgName,
+        setProgress
       );
       const newPost = await axios.post("http://localhost:5000/post/", {
         userId: currentUser._id,
@@ -43,6 +47,7 @@ const SharePost = () => {
         img: url,
       });
       dispatch({ type: "UPDATE_POST", payload: newPost.data.post });
+      dispatch({ type: "LOADING_END" });
       setImgFile(null);
       captionRef.current!.value = "";
     } catch (error) {
@@ -134,6 +139,13 @@ const SharePost = () => {
           sx={{ ml: "auto", textTransform: "capitalize" }}
         >
           Share
+          {loading && (
+            <CircularProgress
+              value={progress}
+              size={24}
+              sx={{ color: "white", ml: 1 }}
+            />
+          )}
         </Button>
       </Box>
     </Paper>

@@ -19,6 +19,10 @@ interface StateProp {
 
 const reducer = (state: StateProp, action: Action) => {
   switch (action.type) {
+    case "LOADING_START":
+      return { ...state, loading: true };
+    case "LOADING_END":
+      return { ...state, loading: false };
     case "LOGIN_START":
       return { ...state, loading: true };
     case "LOGIN_SUCCESS":
