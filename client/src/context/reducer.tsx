@@ -30,7 +30,7 @@ const reducer = (state: StateProp, action: Action) => {
     case "UPDATE_POST":
       return {
         ...state,
-        timelinePost: [...state.timelinePost, action.payload],
+        timelinePost: [action.payload, ...state.timelinePost],
       };
     case "FOLLOW_USER":
       return {

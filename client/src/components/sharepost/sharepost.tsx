@@ -43,6 +43,8 @@ const SharePost = () => {
         img: url,
       });
       dispatch({ type: "UPDATE_POST", payload: newPost.data.post });
+      setImgFile(null);
+      captionRef.current!.value = "";
     } catch (error) {
       alert(`${error}`);
     }

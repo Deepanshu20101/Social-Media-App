@@ -38,6 +38,10 @@ const Posts: React.FC<{ profileUserId?: string }> = ({ profileUserId }) => {
     getPosts();
   }, [profileUserId, state.currentUser._id]);
 
+  useEffect(() => {
+    setPosts(state.timelinePost);
+  }, [state.timelinePost]);
+
   return (
     <Box
       sx={{
