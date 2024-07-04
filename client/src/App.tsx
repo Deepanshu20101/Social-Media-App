@@ -6,6 +6,7 @@ import HomePage from "./components/home/home";
 import "./App.css";
 import ProfilePage from "./components/profile/profile";
 import { Context } from "./context/contextprovider";
+import Chat from "./components/chat/chat";
 
 function App() {
   const { state } = useContext(Context);
@@ -31,6 +32,12 @@ function App() {
               ) : (
                 <Navigate replace to="/login" />
               )
+            }
+          />
+          <Route
+            path="/chat"
+            element={
+              state.currentUser ? <Chat /> : <Navigate replace to="/login" />
             }
           />
           <Route path="/login" element={<LoginPage />} />
