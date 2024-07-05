@@ -79,7 +79,13 @@ const TopBar = () => {
               <Person />
             </Badge>
           </IconButton>
-          <IconButton color="inherit" size="large">
+          <IconButton
+            color="inherit"
+            size="large"
+            onClick={() => {
+              navigate("/chat");
+            }}
+          >
             <Badge badgeContent={2} color="error">
               <Chat />
             </Badge>
