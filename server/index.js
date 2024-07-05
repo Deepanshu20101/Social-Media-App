@@ -7,6 +7,8 @@ const morgan = require("morgan");
 const userRoute = require("./routes/userRoute");
 const authRoute = require("./routes/authRoute");
 const postRoute = require("./routes/postRoute");
+const conversationRoute = require("./routes/conversationRoute");
+const messageRoute = require("./routes/messageRoute");
 
 dotenv.config();
 
@@ -20,6 +22,8 @@ const port = 5000;
 app.use("/user", userRoute);
 app.use("/auth", authRoute);
 app.use("/post", postRoute);
+app.use("/chat/conversation", conversationRoute);
+app.use("/chat/message", messageRoute);
 
 const startServer = async () => {
   try {
