@@ -14,7 +14,6 @@ interface messagesProp {
 const Message: React.FC<{ message: messagesProp }> = ({ message }) => {
   const { state } = useContext(Context);
   const { currentUser } = state;
-  console.log(message);
 
   return (
     <Box

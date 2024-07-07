@@ -11,7 +11,7 @@ import {
 import TopBar from "../topbar/topbar";
 import ChatsLeft from "./chatsLeft/chatsLeft";
 import ChatsRight from "./chatsRight/chatsRight";
-import { Key, useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Context } from "../../context/contextprovider";
 import Message from "./message/message";
 import { Send } from "@mui/icons-material";
@@ -34,9 +34,12 @@ const Chat = () => {
   const { state } = useContext(Context);
   const { currentUser } = state;
 
-  const [conversations, setConversations] = useState<conversationsProp[]>();
+  const [conversations, setConversations] = useState<conversationsProp[]>([]);
   const [currentChat, setCurrentChat] = useState<conversationsProp>();
-  const [messages, setMessages] = useState<messagesProp[]>();
+  const [messages, setMessages] = useState<messagesProp[]>([]);
+  const [newMessage, setNewMessage] = useState<string>();
+
+  const scrollEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const getConversations = async () => {
@@ -65,6 +68,24 @@ const Chat = () => {
     };
     getMessages();
   }, [currentChat]);
+
+  const handleSend = async () => {
+    try {
+      const res = await axios.post("http://localhost:5000/chat/message/", {
+        conversationId: currentChat?._id,
+        sender: currentUser._id,
+        text: newMessage,
+      });
+      setMessages([...messages, res.data.messageData]);
+      setNewMessage("");
+    } catch (error) {
+      alert(`${error}`);
+    }
+  };
+
+  useEffect(() => {
+    scrollEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   return (
     <>
@@ -110,6 +131,7 @@ const Chat = () => {
                   {messages?.map((message, idx) => (
                     <Message message={message} key={idx} />
                   ))}
+                  <div ref={scrollEndRef} />
                 </Box>
                 <Box
                   sx={{
@@ -125,11 +147,14 @@ const Chat = () => {
                     label="Send a message..."
                     multiline
                     variant="standard"
+                    onChange={(e) => setNewMessage(e.target.value)}
+                    value={newMessage}
                     sx={{ flexGrow: 1, mr: 2 }}
                   />
                   <Button
                     variant="contained"
                     endIcon={<Send />}
+                    onClick={handleSend}
                     sx={{
                       textTransform: "capitalize",
                       bgcolor: "#00ADB5",
