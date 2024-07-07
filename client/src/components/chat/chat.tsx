@@ -16,6 +16,7 @@ import { Context } from "../../context/contextprovider";
 import Message from "./message/message";
 import { Send } from "@mui/icons-material";
 import axios from "axios";
+import { io, Socket } from "socket.io-client";
 
 interface conversationsProp {
   _id: string;
@@ -38,6 +39,7 @@ const Chat = () => {
   const [currentChat, setCurrentChat] = useState<conversationsProp>();
   const [messages, setMessages] = useState<messagesProp[]>([]);
   const [newMessage, setNewMessage] = useState<string>();
+  const [socket, setSocket] = useState<Socket>();
 
   const scrollEndRef = useRef<HTMLDivElement>(null);
 
@@ -69,6 +71,14 @@ const Chat = () => {
     getMessages();
   }, [currentChat]);
 
+  useEffect(() => {
+    scrollEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  useEffect(() => {
+    setSocket(io("ws://localhost:8000"));
+  }, []);
+
   const handleSend = async () => {
     try {
       const res = await axios.post("http://localhost:5000/chat/message/", {
@@ -82,10 +92,6 @@ const Chat = () => {
       alert(`${error}`);
     }
   };
-
-  useEffect(() => {
-    scrollEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
 
   return (
     <>
