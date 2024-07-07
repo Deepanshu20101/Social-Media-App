@@ -6,7 +6,8 @@ import {
   ListItemText,
 } from "@mui/material";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { Dispatch, useContext, useEffect, useState } from "react";
+import { Context } from "../../../context/contextprovider";
 
 interface UserProp {
   _id: string;
@@ -21,14 +22,25 @@ interface UserProp {
   relationship: "Single" | "Married";
 }
 
-const ChatsLeft: React.FC<{ userId: string }> = ({ userId }) => {
+interface conversationsProp {
+  _id: string;
+  members: [];
+}
+
+const ChatsLeft: React.FC<{
+  conversation: conversationsProp;
+  setCurrentChat: Dispatch<React.SetStateAction<conversationsProp | undefined>>;
+}> = ({ conversation, setCurrentChat }) => {
+  const { state } = useContext(Context);
   const [user, setUser] = useState<UserProp>();
 
   useEffect(() => {
     const getUser = async () => {
       try {
         const foundUser = await axios.get(
-          `http://localhost:5000/user/${userId}`
+          `http://localhost:5000/user/${conversation.members.find(
+            (m) => m !== state.currentUser._id
+          )}`
         );
         setUser(foundUser.data.user);
       } catch (error) {
@@ -36,11 +48,15 @@ const ChatsLeft: React.FC<{ userId: string }> = ({ userId }) => {
       }
     };
     getUser();
-  }, [userId]);
+  }, [conversation]);
 
   return (
     <ListItem disablePadding>
-      <ListItemButton>
+      <ListItemButton
+        onClick={() => {
+          setCurrentChat(conversation);
+        }}
+      >
         <ListItemAvatar>
           <Avatar src={user?.profilePic} />
         </ListItemAvatar>

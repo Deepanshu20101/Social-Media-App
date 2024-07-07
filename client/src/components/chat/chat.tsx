@@ -6,18 +6,66 @@ import {
   List,
   TextField,
   Toolbar,
+  Typography,
 } from "@mui/material";
 import TopBar from "../topbar/topbar";
 import ChatsLeft from "./chatsLeft/chatsLeft";
 import ChatsRight from "./chatsRight/chatsRight";
-import { Key, useContext } from "react";
+import { Key, useContext, useEffect, useState } from "react";
 import { Context } from "../../context/contextprovider";
 import Message from "./message/message";
 import { Send } from "@mui/icons-material";
+import axios from "axios";
+
+interface conversationsProp {
+  _id: string;
+  members: [];
+}
+
+interface messagesProp {
+  _id: string;
+  conversationId: string;
+  sender: string;
+  text: string;
+  createdAt: Date;
+}
 
 const Chat = () => {
   const { state } = useContext(Context);
   const { currentUser } = state;
+
+  const [conversations, setConversations] = useState<conversationsProp[]>();
+  const [currentChat, setCurrentChat] = useState<conversationsProp>();
+  const [messages, setMessages] = useState<messagesProp[]>();
+
+  useEffect(() => {
+    const getConversations = async () => {
+      try {
+        const conversations = await axios.get(
+          `http://localhost:5000/chat/conversation/${currentUser._id}`
+        );
+        setConversations(conversations.data.conversation);
+      } catch (error) {
+        alert(`${error}`);
+      }
+    };
+    getConversations();
+  }, []);
+
+  useEffect(() => {
+    const getMessages = async () => {
+      try {
+        const messages = await axios.get(
+          `http://localhost:5000/chat/message/${currentChat?._id}`
+        );
+        setMessages(messages.data.message);
+      } catch (error) {
+        alert(`${error}`);
+      }
+    };
+    getMessages();
+  }, [currentChat]);
+
   return (
     <>
       <TopBar />
@@ -37,8 +85,12 @@ const Chat = () => {
             />
             <Divider variant="middle" />
             <List>
-              {currentUser.following.map((userId: string) => (
-                <ChatsLeft userId={userId} key={userId} />
+              {conversations?.map((c, idx) => (
+                <ChatsLeft
+                  conversation={c}
+                  setCurrentChat={setCurrentChat}
+                  key={idx}
+                />
               ))}
             </List>
           </Grid>
@@ -52,39 +104,47 @@ const Chat = () => {
               px: 2,
             }}
           >
-            <Box sx={{ flexGrow: 1, mt: 2, overflowY: "auto" }}>
-              <Message />
-            </Box>
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                my: 2,
-                p: 2,
-                bgcolor: "#EEEEEE",
-                borderRadius: 3,
-              }}
-            >
-              <TextField
-                label="Send a message..."
-                multiline
-                variant="standard"
-                sx={{ flexGrow: 1, mr: 2 }}
-              />
-              <Button
-                variant="contained"
-                endIcon={<Send />}
-                sx={{
-                  textTransform: "capitalize",
-                  bgcolor: "#00ADB5",
-                  "&:hover": {
-                    bgcolor: "#393E46",
-                  },
-                }}
-              >
-                Send
-              </Button>
-            </Box>
+            {currentChat ? (
+              <>
+                <Box sx={{ flexGrow: 1, mt: 2, overflowY: "auto" }}>
+                  {messages?.map((message, idx) => (
+                    <Message message={message} key={idx} />
+                  ))}
+                </Box>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    my: 2,
+                    p: 2,
+                    bgcolor: "#EEEEEE",
+                    borderRadius: 3,
+                  }}
+                >
+                  <TextField
+                    label="Send a message..."
+                    multiline
+                    variant="standard"
+                    sx={{ flexGrow: 1, mr: 2 }}
+                  />
+                  <Button
+                    variant="contained"
+                    endIcon={<Send />}
+                    sx={{
+                      textTransform: "capitalize",
+                      bgcolor: "#00ADB5",
+                      "&:hover": {
+                        bgcolor: "#393E46",
+                      },
+                    }}
+                  >
+                    Send
+                  </Button>
+                </Box>
+              </>
+            ) : (
+              <Typography>Start chat</Typography>
+            )}
           </Grid>
           <Grid bgcolor="#DBE2EF" item lg={4} sx={{ pt: 1.3 }}>
             {currentUser.following.map((userId: string) => (
