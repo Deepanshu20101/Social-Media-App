@@ -39,9 +39,20 @@ const Chat = () => {
   const [currentChat, setCurrentChat] = useState<conversationsProp>();
   const [messages, setMessages] = useState<messagesProp[]>([]);
   const [newMessage, setNewMessage] = useState<string>();
-  const [socket, setSocket] = useState<Socket>();
+  const socket = useRef<Socket>();
 
   const scrollEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    socket.current?.emit("addUser", currentUser._id);
+    socket.current?.on("getUsers", (users) => {
+      console.log(users);
+    });
+  }, [currentUser]);
+
+  useEffect(() => {
+    socket.current = io("ws://localhost:8000");
+  }, []);
 
   useEffect(() => {
     const getConversations = async () => {
@@ -74,10 +85,6 @@ const Chat = () => {
   useEffect(() => {
     scrollEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
-
-  useEffect(() => {
-    setSocket(io("ws://localhost:8000"));
-  }, []);
 
   const handleSend = async () => {
     try {
