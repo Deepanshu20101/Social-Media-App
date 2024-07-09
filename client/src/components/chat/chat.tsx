@@ -20,11 +20,11 @@ import { io, Socket } from "socket.io-client";
 
 interface conversationsProp {
   _id: string;
-  members: [];
+  members: string[];
 }
 
 interface messagesProp {
-  _id: string;
+  _id?: string;
   conversationId: string;
   sender: string;
   text: string;
@@ -36,47 +36,77 @@ const Chat = () => {
   const { currentUser } = state;
 
   const [conversations, setConversations] = useState<conversationsProp[]>([]);
-  const [currentChat, setCurrentChat] = useState<conversationsProp>();
+  const [currentChat, setCurrentChat] = useState<conversationsProp | null>(
+    null
+  );
   const [messages, setMessages] = useState<messagesProp[]>([]);
-  const [newMessage, setNewMessage] = useState<string>();
+  const [newMessage, setNewMessage] = useState<string>("");
+  const [receiverMessage, setReceivedMessage] = useState<messagesProp | null>(
+    null
+  );
   const socket = useRef<Socket>();
 
   const scrollEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    socket.current?.emit("addUser", currentUser._id);
-    socket.current?.on("getUsers", (users) => {
-      console.log(users);
+    socket.current = io("ws://localhost:8000");
+    socket.current.on("getMessage", (data) => {
+      if (currentChat) {
+        setReceivedMessage({
+          sender: data.senderId,
+          text: data.text,
+          conversationId: currentChat._id,
+          createdAt: new Date(),
+        });
+      }
     });
+  }, [currentChat]);
+
+  useEffect(() => {
+    if (
+      receiverMessage &&
+      currentChat?.members.includes(receiverMessage.sender)
+    ) {
+      setMessages((prev) => [...prev, receiverMessage]);
+    }
+  }, [receiverMessage, currentChat]);
+
+  useEffect(() => {
+    if (currentUser) {
+      socket.current?.emit("addUser", currentUser._id);
+      socket.current?.on("getUsers", (users) => {
+        console.log(users);
+      });
+    }
   }, [currentUser]);
 
   useEffect(() => {
-    socket.current = io("ws://localhost:8000");
-  }, []);
-
-  useEffect(() => {
     const getConversations = async () => {
-      try {
-        const conversations = await axios.get(
-          `http://localhost:5000/chat/conversation/${currentUser._id}`
-        );
-        setConversations(conversations.data.conversation);
-      } catch (error) {
-        alert(`${error}`);
+      if (currentUser) {
+        try {
+          const conversations = await axios.get(
+            `http://localhost:5000/chat/conversation/${currentUser._id}`
+          );
+          setConversations(conversations.data.conversation);
+        } catch (error) {
+          alert(`${error}`);
+        }
       }
     };
     getConversations();
-  }, []);
+  }, [currentUser]);
 
   useEffect(() => {
     const getMessages = async () => {
-      try {
-        const messages = await axios.get(
-          `http://localhost:5000/chat/message/${currentChat?._id}`
-        );
-        setMessages(messages.data.message);
-      } catch (error) {
-        alert(`${error}`);
+      if (currentChat) {
+        try {
+          const messages = await axios.get(
+            `http://localhost:5000/chat/message/${currentChat._id}`
+          );
+          setMessages(messages.data.message);
+        } catch (error) {
+          alert(`${error}`);
+        }
       }
     };
     getMessages();
@@ -87,14 +117,23 @@ const Chat = () => {
   }, [messages]);
 
   const handleSend = async () => {
+    if (!currentChat || !currentUser) return;
     try {
       const res = await axios.post("http://localhost:5000/chat/message/", {
-        conversationId: currentChat?._id,
+        conversationId: currentChat._id,
         sender: currentUser._id,
         text: newMessage,
       });
       setMessages([...messages, res.data.messageData]);
       setNewMessage("");
+
+      const receiverId = currentChat.members.find((m) => m !== currentUser._id);
+
+      socket.current?.emit("sendMessage", {
+        senderId: currentUser._id,
+        receiverId: receiverId,
+        text: newMessage,
+      });
     } catch (error) {
       alert(`${error}`);
     }

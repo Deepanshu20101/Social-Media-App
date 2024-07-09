@@ -4,7 +4,7 @@ import { Context } from "../../../context/contextprovider";
 import { format } from "timeago.js";
 
 interface messagesProp {
-  _id: string;
+  _id?: string;
   conversationId: string;
   sender: string;
   text: string;

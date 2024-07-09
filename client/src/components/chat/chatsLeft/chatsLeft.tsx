@@ -24,12 +24,12 @@ interface UserProp {
 
 interface conversationsProp {
   _id: string;
-  members: [];
+  members: string[];
 }
 
 const ChatsLeft: React.FC<{
   conversation: conversationsProp;
-  setCurrentChat: Dispatch<React.SetStateAction<conversationsProp | undefined>>;
+  setCurrentChat: Dispatch<React.SetStateAction<conversationsProp | null>>;
 }> = ({ conversation, setCurrentChat }) => {
   const { state } = useContext(Context);
   const [user, setUser] = useState<UserProp>();
