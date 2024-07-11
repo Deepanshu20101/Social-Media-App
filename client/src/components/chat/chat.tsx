@@ -31,6 +31,11 @@ interface messagesProp {
   createdAt: Date;
 }
 
+interface onlineUsersProp {
+  userId: string;
+  socketId: string;
+}
+
 const Chat = () => {
   const { state } = useContext(Context);
   const { currentUser } = state;
@@ -41,55 +46,56 @@ const Chat = () => {
   );
   const [messages, setMessages] = useState<messagesProp[]>([]);
   const [newMessage, setNewMessage] = useState<string>("");
-  const [receiverMessage, setReceivedMessage] = useState<messagesProp | null>(
-    null
-  );
-  const socket = useRef<Socket>();
+  const [onlineUsers, setOnlineUsers] = useState<onlineUsersProp[]>([]);
+  const [onlineFriends, setOnlineFriends] = useState<onlineUsersProp[]>([]);
 
+  const socket = useRef<Socket>();
   const scrollEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     socket.current = io("ws://localhost:8000");
+
     socket.current.on("getMessage", (data) => {
-      if (currentChat) {
-        setReceivedMessage({
+      setMessages((prev) => [
+        ...prev,
+        {
+          _id: data._id,
+          conversationId: currentChat?._id || "",
           sender: data.senderId,
           text: data.text,
-          conversationId: currentChat._id,
           createdAt: new Date(),
-        });
-      }
+        },
+      ]);
     });
-  }, [currentChat]);
+
+    return () => {
+      socket.current?.disconnect();
+    };
+  }, []);
 
   useEffect(() => {
-    if (
-      receiverMessage &&
-      currentChat?.members.includes(receiverMessage.sender)
-    ) {
-      setMessages((prev) => [...prev, receiverMessage]);
-    }
-  }, [receiverMessage, currentChat]);
-
-  useEffect(() => {
-    if (currentUser) {
-      socket.current?.emit("addUser", currentUser._id);
-      socket.current?.on("getUsers", (users) => {
-        console.log(users);
-      });
-    }
+    socket.current?.emit("addUser", currentUser._id);
+    socket.current?.on("getUsers", (users) => {
+      setOnlineUsers(users);
+    });
   }, [currentUser]);
+
+  useEffect(() => {
+    setOnlineFriends(
+      onlineUsers.filter((user) => currentUser.following.includes(user.userId))
+    );
+  }, [currentUser.following, onlineUsers]);
 
   useEffect(() => {
     const getConversations = async () => {
       if (currentUser) {
         try {
-          const conversations = await axios.get(
+          const res = await axios.get(
             `http://localhost:5000/chat/conversation/${currentUser._id}`
           );
-          setConversations(conversations.data.conversation);
+          setConversations(res.data.conversation);
         } catch (error) {
-          alert(`${error}`);
+          console.error(error);
         }
       }
     };
@@ -100,12 +106,12 @@ const Chat = () => {
     const getMessages = async () => {
       if (currentChat) {
         try {
-          const messages = await axios.get(
+          const res = await axios.get(
             `http://localhost:5000/chat/message/${currentChat._id}`
           );
-          setMessages(messages.data.message);
+          setMessages(res.data.message);
         } catch (error) {
-          alert(`${error}`);
+          console.error(error);
         }
       }
     };
@@ -135,7 +141,7 @@ const Chat = () => {
         text: newMessage,
       });
     } catch (error) {
-      alert(`${error}`);
+      console.error(error);
     }
   };
 
@@ -224,8 +230,12 @@ const Chat = () => {
             )}
           </Grid>
           <Grid bgcolor="#DBE2EF" item lg={4} sx={{ pt: 1.3 }}>
-            {currentUser.following.map((userId: string) => (
-              <ChatsRight userId={userId} key={userId} />
+            {onlineFriends.map((user) => (
+              <ChatsRight
+                userId={user.userId}
+                key={user.userId}
+                setCurrentChat={setCurrentChat}
+              />
             ))}
           </Grid>
         </Grid>

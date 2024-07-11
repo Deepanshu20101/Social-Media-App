@@ -7,7 +7,8 @@ import {
   ListItemText,
 } from "@mui/material";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { Dispatch, useContext, useEffect, useState } from "react";
+import { Context } from "../../../context/contextprovider";
 
 interface UserProp {
   _id: string;
@@ -22,8 +23,18 @@ interface UserProp {
   relationship: "Single" | "Married";
 }
 
-const ChatsRight: React.FC<{ userId: string }> = ({ userId }) => {
+interface conversationsProp {
+  _id: string;
+  members: string[];
+}
+
+const ChatsRight: React.FC<{
+  userId: string;
+  setCurrentChat: Dispatch<React.SetStateAction<conversationsProp | null>>;
+}> = ({ userId, setCurrentChat }) => {
   const [user, setUser] = useState<UserProp>();
+  const { state } = useContext(Context);
+  const { currentUser } = state;
 
   useEffect(() => {
     const getUser = async () => {
@@ -39,9 +50,21 @@ const ChatsRight: React.FC<{ userId: string }> = ({ userId }) => {
     getUser();
   }, [userId]);
 
+  const handleClick = async () => {
+    try {
+      const conversation = await axios.post(
+        "http://localhost:5000/chat/conversation/",
+        { members: [currentUser._id, userId] }
+      );
+      setCurrentChat(conversation.data.conversation);
+    } catch (error) {
+      alert(`${error}`);
+    }
+  };
+
   return (
     <ListItem disablePadding>
-      <ListItemButton>
+      <ListItemButton onClick={handleClick}>
         <ListItemAvatar>
           <Badge badgeInset="14%" color="success">
             <Avatar src={user?.profilePic} />
